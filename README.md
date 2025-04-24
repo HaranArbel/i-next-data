@@ -57,11 +57,11 @@ Therefore:
 - [x] Set up PostgreSQL container with Docker
 - [x] Create database schema
 - [x] Create data ingestion scripts for CSV files
-- [ ] Add database indexes for performance optimization
+- [x] Add database indexes for performance optimization
   - Admission status index
   - Lab tests timeline index
   - Lab results timeline index
-- [ ] Create view for patients without recent tests
+- [x] Create view for patients without recent tests
   - View to identify patients needing attention
   - Include test order and result timestamps
   - Add admission duration calculation
@@ -75,9 +75,9 @@ Therefore:
 
 ### Backend
 
-- [ ] Set up FastAPI project structure
-- [ ] Implement database models with SQLAlchemy
-- [ ] Create API endpoint for patients needing tests
+- [x] Set up FastAPI project structure
+- [x] Implement database models with SQLAlchemy
+- [x] Create API endpoint for patients needing tests
 - [ ] Create API endpoints for patient data
 - [ ] Create API endpoints for lab tests
 - [ ] Implement filtering and pagination
