@@ -5,7 +5,7 @@ from ..services.monitoring import MonitoringServiceBase
 from ..dependencies import get_monitoring_service
 
 router = APIRouter(
-    prefix="/patients",
+    prefix="/monitoring",
     tags=["monitoring"]
 )
 
