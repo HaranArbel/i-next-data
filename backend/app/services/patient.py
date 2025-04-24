@@ -1,9 +1,23 @@
+from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 from ..models.patient import Patient
 from ..schemas.patient import PatientCreate
 from typing import List
 
-class PatientService:
+class PatientServiceBase(ABC):
+    @abstractmethod
+    def create_patient(self, patient: PatientCreate) -> Patient:
+        pass
+
+    @abstractmethod
+    def get_patients(self) -> List[Patient]:
+        pass
+
+    @abstractmethod
+    def get_patient(self, patient_id: int) -> Patient:
+        pass
+
+class PatientService(PatientServiceBase):
     def __init__(self, db: Session):
         self.db = db
 
@@ -16,7 +30,7 @@ class PatientService:
         return db_patient
 
     def get_patients(self) -> List[Patient]:
-        """Get list of patients with limit"""
+        """Get list of patients"""
         return self.db.query(Patient).all()
 
     def get_patient(self, patient_id: int) -> Patient:

@@ -35,7 +35,7 @@ def test_get_patients_needing_tests(client: TestClient, mock_monitoring_data):
     """Test monitoring endpoint with mocked service"""
     app.dependency_overrides[get_monitoring_service] = lambda: MockMonitoringService(mock_monitoring_data)
     
-    response = client.get("/patients/needing-tests")
+    response = client.get("/monitoring/needing-tests")
     assert response.status_code == 200
     patients = response.json()
     

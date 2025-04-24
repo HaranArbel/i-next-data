@@ -18,6 +18,4 @@ class MonitoringService(MonitoringServiceBase):
     def get_patients_needing_tests(self) -> List[PatientNeedingTests]:
         """Get all patients who need tests based on monitoring criteria"""
         query = self.db.query(PatientNeedingTests)
-        # Debug: Print the SQL
-        logger.info(f"Monitoring SQL: {query.statement}")
         return query.all() 
