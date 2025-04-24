@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+sqlalchemy
+# Testing dependencies
+pytest
+httpx
+testcontainers-postgres
+pytest-asyncio

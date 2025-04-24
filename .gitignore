@@ -1,3 +1,16 @@
+# Python
 .env
-ETL/
+venv/
 .idea/
+__pycache__/
+.pytest_cache/
+
+# Project files
+ETL/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
