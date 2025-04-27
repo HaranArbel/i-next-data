@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PatientDetails } from '../types/patient';
+import TestHistory from './TestHistory';
 import PatientHeader from './PatientHeader';
 import PatientInfoTable from './PatientInfoTable';
 
@@ -20,6 +21,7 @@ const PatientCard: React.FC<PatientCardProps> = ({ patientDetails }) => {
     >
       <PatientHeader patientDetails={patientDetails} />
       <PatientInfoTable patientDetails={patientDetails} />
+      <TestHistory patientId={patientDetails.patient_id} />
     </div>
   );
 };

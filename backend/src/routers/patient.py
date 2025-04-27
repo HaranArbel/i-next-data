@@ -1,20 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
-from typing import List
+from typing import List, Dict
 from sqlalchemy.orm import Session
-from ..schemas.patient import PatientNeedingTests, PatientDetail, TestResult
-from ..services.patient import PatientService
+from ..schemas import PatientDetail, PatientNeedingTests, LabTest, PaginatedResponse
 from ..db.database import get_db
-
+from ..services.patient import PatientService
 router = APIRouter(prefix="/patients", tags=["patients"])
 
 def get_patient_service(db: Session = Depends(get_db)) -> PatientService:
     return PatientService(db)
 
-@router.get("/need_tests", response_model=List[PatientNeedingTests])
-async def get_patients_needing_tests(service: PatientService = Depends(get_patient_service)):
+@router.get("/need_tests", response_model=PaginatedResponse[PatientNeedingTests])
+async def get_patients(page: int, service: PatientService = Depends(get_patient_service)):
     """Get a list of patients who need tests (dashboard view)"""
     try:
-        return service.get_patients_needing_tests()
+        return service.get_patients(page)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -34,7 +33,7 @@ async def get_patient_details(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/{patient_id}/tests", response_model=List[TestResult])
+@router.get("/{patient_id}/tests", response_model=List[LabTest])
 async def get_patient_tests(
     patient_id: int = Path(..., title="The ID of the patient to get tests for"),
     service: PatientService = Depends(get_patient_service)

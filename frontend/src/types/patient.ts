@@ -1,3 +1,8 @@
+export interface PaginatedResponse<T> {
+  items: T[];
+  total_pages: number;
+}
+
 export interface Patient {
   patient_id: number;
   first_name: string;
@@ -27,27 +32,3 @@ export interface PatientDetails {
   blood_type: string;
   allergies: string;
 }
-
-
-// export interface TestResult {
-//   test_id: number
-//   test_name: string
-//   ordering_physician: string
-//   order_datetime: string
-//   result_value?: string
-//   result_unit?: string
-//   result_status?: 'Normal' | 'Abnormal'
-//   performed_datetime?: string
-// }
-
-// export interface PatientTest {
-//   test_id: number
-//   test_name: string
-//   ordering_physician: string
-//   order_datetime: string
-//   performed_datetime: string
-// }
-
-// export interface PatientDetail extends PatientNeedingCare {
-//   test_history: TestResult[]
-// }

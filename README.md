@@ -54,18 +54,18 @@ _(Consider adding a small structure tree if relevant.)_
 - [x] Set up FastAPI project structure
 - [x] Implement database models with SQLAlchemy
 - [x] Create API endpoint for patients needing tests
-- [ ] Create additional API endpoints:
+- [x] Create additional API endpoints:
   - Patient data
   - Lab tests
 - [ ] Implement backend filtering (e.g., department, physician) 🔎
-- [ ] Implement pagination for API responses 📄
+- [ ] Use `asyncpg` driver and threading for improved DB access ⚡ + connection pool
+- [x] Implement pagination for API responses 📄
 - [ ] Add sorting functionality in API (sort by name, time since admission, last test ordered) ↕️
 - [x] Add request validation with Pydantic ✅
+- [ ] Add strict versioning to requirements.txt
 - [ ] Add error handling and logging 🐞
-- [ ] Add a rate limiter to API 🚦
-- [ ] Add user authentication and authorization 🔐
+- [ ] Add a rate limiter to API ? 🚦
 - [ ] Review admission time threshold logic (configurable 48-hour rule) 🕒
-- [ ] Use `asyncpg` driver and threading for improved DB access ⚡
 - [ ] Update and enrich dummy data (realistic admissions/tests from 2024-2025) 🏥
 
 #### 🚀 Backend - Next Steps
@@ -81,61 +81,58 @@ _(Consider adding a small structure tree if relevant.)_
 - [x] Create component structure 🧩
 - [x] Implement patient list view (table) 🏥
 - [x] Implement patient details view 📋
-- [ ] Display lab test results per patient 🧪
+- [ ] Set up loading spinner for Patient Table data with animation
+- [x] Display test history and results per patient 🧪
 - [ ] Implement frontend-side filters (department, physician) 🔍
-- [ ] Implement frontend pagination 📚
-- [ ] Implement sorting by table columns ↕️
-- [ ] Add search functionality with debounce 🔎⏱️
+- [x] Implement frontend pagination 📚 - Replace with Infinity Scroll ?
 - [ ] Add loading and error states ⏳
-- [ ] Add UI notifications for new test orders (real-time updates) 📢
-- [ ] Update frontend to latest React Router version 🚀
-- [ ] Implement responsive design 📱
 
 #### 🚀 Frontend - Next Steps
 
 - [ ] 🔎⏱️ Add live search with debounce
 - [ ] 📢 Add real-time UI notifications for new test orders (using WebSocket)
+- [ ] 📊 Add dashboard stats (patient counts, averages, etc.)
 - [ ] 🚀 Migrate frontend to the latest React Router version
+- [ ] Add search functionality with debounce 🔎⏱️
+- [ ] Add UI notifications for new test orders (real-time updates) 📢
+- [ ] Add dashboard stats (e.g., number of patients needing tests, average admission time) 📊
+- [ ] Update frontend to latest React Router version 🚀
+- [ ] Implement responsive design 📱
+- [ ] Implement sorting by table columns ↕️
 
 ---
 
 ### 🗄️ Database
 
-- [x] Set up PostgreSQL container with Docker 🐳
 - [x] Create database schema 📊
-- [x] Create data ingestion scripts for CSV files 📥
-- [x] Add database indexes:
+- [x] Create ETL for CSV files 📥
+- [x] Add database indicies:
   - Admission status index
   - Lab tests timeline index
   - Lab results timeline index
+- [x] Set up database validation and constraints 🔐
 - [x] Create `patients_needing_tests` view 🏥
-- [ ] Convert `patients_needing_tests` to materialized view 🏗️
-- [ ] Automatically refresh materialized view when new S3 files are written 🔄
-- [ ] Set up read replicas for scaling 🛢️
-- [ ] Polish database schema (consider denormalization) 🛠️
-- [ ] Set up database validation and constraints 🔐
+- [x] Set up PostgreSQL on cloud ☁️🛢️
+- [ ] Convert `patients_needing_tests` to materialized view ? 🏗️
+- [ ] Set up read replicas for scaling 🛢️ ?
+- [ ] Polish database schema (consider denormalization) 🛠️ ?
 - [ ] Create backup and restore procedures 💾
-
-#### 🚀 Database - Next Steps
-
-- [ ] 🔄 Convert view to a materialized view with automatic refresh
-- [ ] 🛢️ Set up read replicas for scaling
+- [ ] Review and optimize indices 🔍
 
 ---
 
 ### 🧪 Testing and CI/CD
 
-- [ ] Set up test environment with Testcontainers 🧪
-- [ ] Write unit tests for backend services 🧹
-- [ ] Write integration tests for API endpoints 🔗
-- [ ] Write frontend component tests 🖥️
-- [ ] Create end-to-end tests (e.g., Playwright, Cypress) 🎭
+- [x] Set up test environment with Pytest 🧪
+- [x] Write unit tests for backend services 🧹
 - [ ] Fix broken or incomplete pytest tests 🛠️
-- [ ] Set up CI/CD pipeline 🚀
-- [ ] Configure automatic testing on pull requests 🔄
+- [ ] Set up CI/CD pipeline (github action) 🚀
+  - Configure automatic testing on pull requests (to dev and master) 🔄
 
 #### 🚀 Testing and CI/CD - Next Steps
 
+- [ ] Create end-to-end tests (e.g., Playwright, Cypress) 🎭
+- [ ] Write integration tests for API endpoints 🔗
 - [ ] 🎭 Implement full end-to-end testing (e.g., Playwright, Cypress)
 - [ ] 🚀 Set up CI/CD pipeline to automate build and test workflows
 
@@ -143,16 +140,16 @@ _(Consider adding a small structure tree if relevant.)_
 
 ### ☁️ Infrastructure
 
-- [x] Set up Docker Compose for local development ⚙️
-- [ ] Configure environment variables ⚙️
+- [x] Set up Docker Compose 🐳
+- [x] Configure environment variables ⚙️
 - [ ] Configure backend and database health checks 🩺
-- [ ] Configure centralized logging and monitoring 📈
 - [ ] Deploy application to cloud environment ☁️
-- [ ] Configure database backups and monitoring 💾
 
 #### 🚀 Infrastructure - Next Steps
 
 - [ ] ☁️ Deploy the full system to a production cloud environment
+- [ ] Configure centralized logging and monitoring 📈
+- [ ] Configure database backups and monitoring 💾
 
 ### Deployment
 

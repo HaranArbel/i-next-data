@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Patient } from '../types/patient';
-import { format } from 'date-fns';
-import { Calendar, Clock, User, Building2, Activity, FlaskConical } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
+import { Calendar, Clock, User, Building2, Activity, FlaskConical, AlertTriangle } from 'lucide-react';
+import Pagination from './Pagination';
 
 interface PatientTableProps {
   patients: Patient[];
   onPatientSelect: (patientId: number) => void;
+  currentPage: number;
+  totalPages: number;
+  handlePageChange: (page: number) => void;
 }
 
-const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect }) => {
+
+const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect, currentPage, totalPages, handlePageChange }) => {
+
   const formatDateTime = (dateStr: string, timeStr: string) => {
     const date = new Date(`${dateStr.split('T')[0]}T${timeStr}`);
     return format(date, 'MMM dd, yyyy HH:mm');
@@ -16,6 +22,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect }
 
   const formatTimeSinceAdmission = (duration: string) => {
     return duration.replace(/P(\d+)Y(\d+)DT(\d+)H(\d+)M.*/, '$1y $2d $3h $4m');
+  };
+
+  const getTimeSinceLastTest = (lastTestDate: string) => {
+    return formatDistanceToNow(new Date(lastTestDate), { addSuffix: true });
   };
 
   return (
@@ -85,18 +95,18 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect }
                       Room {patient.room_number}
                     </div>
                     <div className="mt-1 text-sm text-gray-500">
-                      Primary: {patient.primary_physician}
+                      Primary Physician: {patient.primary_physician}
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-900">
-                      <FlaskConical className="h-4 w-4 text-pink-500" />
+                      <FlaskConical className="h-4 w-4 text-cyan-500" />
                       <span>{patient.test_name}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
-                      <Activity className="h-4 w-4 text-yellow-500" />
-                      <span>Time Since Last Test: {formatTimeSinceAdmission(patient.time_since_admission)}</span>
+                      <AlertTriangle className="h-4 w-4 text-orange-500" />
+                      <span>Time Since Last Test: {getTimeSinceLastTest(patient.last_test_datetime)}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                       <Clock className="h-4 w-4 text-gray-500" />
@@ -109,6 +119,15 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect }
             </tbody>
           </table>
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </div>
   );

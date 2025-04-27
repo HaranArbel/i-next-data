@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import patient
+from .routers import patient, lab_test
 from .config import settings
 from .routers.patient import router as patients_router
+from .routers.lab_test import router as lab_tests_router
 
 app = FastAPI()
 
@@ -17,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(patient.router)
+app.include_router(lab_test.router)
 
 @app.get("/")
 async def root():

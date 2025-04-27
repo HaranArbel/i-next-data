@@ -9,4 +9,5 @@ class LabTest(Base):
     test_name = Column(String)
     order_date = Column(Date)
     order_time = Column(Time)
-    ordering_physician = Column(String) 
+    ordering_physician = Column(String)
+    

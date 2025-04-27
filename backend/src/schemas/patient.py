@@ -17,6 +17,10 @@ class PatientCreate(PatientBase):
 class Patient(PatientBase):
     model_config = ConfigDict(from_attributes=True)
     patient_id: int
+    department: str
+    room_number: str
+    admission_date: date
+    admission_time: time
 
 class TestResult(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -59,4 +63,8 @@ class PatientNeedingTests(BaseModel):
     time_since_admission: timedelta
     last_test_datetime: Optional[datetime] = None
     test_name: Optional[str] = None
-    ordering_physician: Optional[str] = None 
+    primary_physician: Optional[str] = None 
+
+class PaginatedResponse[T](BaseModel):
+    items: List[T]
+    total_pages: int

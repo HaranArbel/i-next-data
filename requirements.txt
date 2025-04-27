@@ -1,7 +1,0 @@
-pandas
-psycopg2-binary
-python-dotenv
-pytest
-fastapi
-uvicorn
-sqlalchemy
