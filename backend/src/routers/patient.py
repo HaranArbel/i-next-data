@@ -7,10 +7,13 @@ from ..services.patient import PatientService
 router = APIRouter(prefix="/patients", tags=["patients"])
 
 @router.get("/need_tests", response_model=PaginatedResponse[PatientNeedingTests])
-async def get_patients(page: int, service: PatientService = Depends(get_patient_service)):
+async def get_patients(
+    page: int, 
+    department: str | None = None, 
+    service: PatientService = Depends(get_patient_service)):
     """Get a list of patients who need tests (dashboard view)"""
     try:
-        return service.get_patients(page)
+        return service.get_patients(page=page, department=department)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -11,12 +11,11 @@ class PatientBase(BaseModel):
     blood_type: str | None = None
     allergies: str | None = None
 
-class Patient(PatientBase):
-    patient_id: int
-    department: str
-    room_number: str
-    admission_date: date
-    admission_time: time
+class PatientCreate(PatientBase):
+    pass
+
+class PatientUpdate(PatientBase):
+    pass
 
 class AggregatedPatientInformation(BaseModel):    
     patient_id: int

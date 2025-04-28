@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from ..db_models.patient import Patient
-from typing import List
+from typing import List, Optional
 from ..db_models.patient import PatientNeedingTests as PatientNeedingTestsModel
 from ..db_models.lab_tests import LabTest as LabTestModel
 from ..db_models.admissions import Admission
@@ -11,7 +11,10 @@ class PatientService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_patients(self, page: int = 1, per_page: int = 10) -> PaginatedResponse[PatientNeedingTests]:
+    def get_patients(
+            self, page: int = 1, 
+            per_page: int = 10, 
+            department: str = None) -> PaginatedResponse[PatientNeedingTests]:
         """
         Get paginated list of patients needing tests
         """
@@ -19,17 +22,19 @@ class PatientService:
         offset = (page - 1) * per_page
         
         # Get total count
-        total_count = self.db.query(PatientNeedingTestsModel).count()
+        query = self.db.query(PatientNeedingTestsModel)
+        if department:
+            query = query.filter(PatientNeedingTestsModel.department == department)
+        
+        total_count = query.count()
         
         # Get paginated results
         patients = (
-            self.db.query(PatientNeedingTestsModel)
-            .order_by(PatientNeedingTestsModel.last_test_datetime.desc())
+            query.order_by(PatientNeedingTestsModel.last_test_datetime.desc())
             .offset(offset)
             .limit(per_page)
             .all()
         )
-        print(patients)
         return {
             "items": patients,
             "total_pages": (total_count + per_page - 1) // per_page
@@ -76,3 +81,5 @@ class PatientService:
             .all()
         )
     
+    def get_all_departments(self):
+        return [row[0] for row in self.db.query(PatientNeedingTestsModel.department).distinct().all()]
