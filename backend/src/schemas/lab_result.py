@@ -1,9 +1,7 @@
 from pydantic import BaseModel
 from datetime import time, date
 
-class LabResult(BaseModel):
-    # model_config = ConfigDict(from_attributes=True)
-    
+class LabResult(BaseModel):    
     test_id: int
     result_value: float | None = None
     result_unit: str | None = None

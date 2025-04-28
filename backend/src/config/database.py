@@ -11,6 +11,7 @@ DATABASE_URL = f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# TODO : add connection pooling
 class Base(DeclarativeBase):
     pass
 

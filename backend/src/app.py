@@ -1,16 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import patient, lab_test
-from .config import settings
-from .routers.patient import router as patients_router
-from .routers.lab_test import router as lab_tests_router
 
 app = FastAPI()
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,  # Using config value
+    allow_origins=["http://localhost:3000"], #TODO: check 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

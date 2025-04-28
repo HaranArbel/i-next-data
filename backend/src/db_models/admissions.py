@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey
-from ..db.database import Base
+from ..config.database import Base
 
 class Admission(Base):
     __tablename__ = "admissions"

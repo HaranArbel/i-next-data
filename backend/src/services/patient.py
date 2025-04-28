@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
-from ..models.patient import Patient
+from ..db_models.patient import Patient
 from typing import List
-from ..models.patient import PatientNeedingTests as PatientNeedingTestsModel
-from ..models.lab_tests import LabTest as LabTestModel
-from ..models.admissions import Admission
-from ..schemas import PaginatedResponse, PatientNeedingTests, PatientDetail, LabTest
-from fastapi import Depends
-from ..db.database import get_db
+from ..db_models.patient import PatientNeedingTests as PatientNeedingTestsModel
+from ..db_models.lab_tests import LabTest as LabTestModel
+from ..db_models.admissions import Admission
+from ..schemas import PaginatedResponse, PatientNeedingTests, AggregatedPatientInformation, LabTest
+
 
 class PatientService:
     def __init__(self, db: Session):
@@ -40,7 +39,7 @@ class PatientService:
         """Get single patient by ID"""
         return self.db.query(Patient).filter(Patient.patient_id == patient_id).first()
 
-    def get_patient_details(self, patient_id: str) -> PatientDetail:
+    def get_patient_details(self, patient_id: str) -> AggregatedPatientInformation:
         """Get detailed patient information"""
         result = (
             self.db.query(Patient, Admission)
@@ -52,7 +51,7 @@ class PatientService:
         if not result:
             return None
             
-        return PatientDetail(
+        return AggregatedPatientInformation(
             patient_id=result.Patient.patient_id,
             first_name=result.Patient.first_name,
             last_name=result.Patient.last_name,
@@ -77,6 +76,3 @@ class PatientService:
             .all()
         )
     
-
-def get_patient_service(db: Session = Depends(get_db)) -> PatientService:
-    return PatientService(db)

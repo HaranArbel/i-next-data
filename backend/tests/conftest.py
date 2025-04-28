@@ -1,8 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from src.app import app
-from src.services.patient import get_patient_service
-from src.services.lab_test import LabTestService, get_lab_test_service
+from src.services.dependencies import get_patient_service, get_lab_test_service
 
 class TestLabTestService:
     def get_test_result(self, test_id: int):
@@ -67,7 +66,7 @@ def override_lab_test_service():
     app.dependency_overrides[get_lab_test_service] = _override_get_lab_test_service
     yield
     app.dependency_overrides.pop(get_lab_test_service, None)
-    
+
 @pytest.fixture(autouse=True)
 def override_patient_service():
     def _override_get_patient_service():

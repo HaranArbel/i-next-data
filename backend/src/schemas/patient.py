@@ -1,5 +1,5 @@
 from datetime import date, datetime, time, timedelta
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from typing import List, Optional
 
 class PatientBase(BaseModel):
@@ -11,31 +11,14 @@ class PatientBase(BaseModel):
     blood_type: str | None = None
     allergies: str | None = None
 
-class PatientCreate(PatientBase):
-    pass
-
 class Patient(PatientBase):
-    model_config = ConfigDict(from_attributes=True)
     patient_id: int
     department: str
     room_number: str
     admission_date: date
     admission_time: time
 
-class TestResult(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
-    test_id: int
-    test_name: str
-    order_datetime: datetime  # We'll combine order_date and order_time in the service
-    ordering_physician: str
-    result_status: Optional[str] = None
-    result_value: Optional[str] = None
-    result_unit: Optional[str] = None
-
-class PatientDetail(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
+class AggregatedPatientInformation(BaseModel):    
     patient_id: int
     first_name: str
     last_name: str
@@ -50,9 +33,7 @@ class PatientDetail(BaseModel):
     blood_type: Optional[str] = None
     allergies: Optional[str] = None
 
-class PatientNeedingTests(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
+class PatientNeedingTests(BaseModel):    
     patient_id: int
     first_name: str
     last_name: str

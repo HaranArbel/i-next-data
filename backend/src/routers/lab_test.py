@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
 from ..schemas import LabResult
-from ..services.lab_test import LabTestService, get_lab_test_service
+from ..services.dependencies import get_lab_test_service
+from ..services.lab_test import LabTestService
 
 router = APIRouter(prefix="/tests", tags=["lab_tests"])
 

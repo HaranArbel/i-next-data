@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
 from typing import List
-from ..schemas import PatientDetail, PatientNeedingTests, LabTest, PaginatedResponse
-from ..services.patient import PatientService, get_patient_service
+from ..schemas import AggregatedPatientInformation, PatientNeedingTests, LabTest, PaginatedResponse
+from ..services.dependencies import get_patient_service
+from ..services.patient import PatientService
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 
@@ -13,7 +14,7 @@ async def get_patients(page: int, service: PatientService = Depends(get_patient_
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/{patient_id}", response_model=PatientDetail)
+@router.get("/{patient_id}", response_model=AggregatedPatientInformation)
 async def get_patient_details(
     patient_id: int = Path(..., title="The ID of the patient to get"),
     service: PatientService = Depends(get_patient_service)
