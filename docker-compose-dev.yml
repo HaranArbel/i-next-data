@@ -11,14 +11,21 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
+    volumes:
+      - ./backend:/app
+    command: uvicorn src.app:app --host 0.0.0.0 --reload
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
+      - 3000:4173
+    volumes:
+      - ./frontend:/app
     environment:
       - VITE_API_URL=http://backend:8000
     depends_on:
       - backend
+    command: npm run dev --host
+ 
