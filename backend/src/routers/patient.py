@@ -1,13 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
-from typing import List, Dict
-from sqlalchemy.orm import Session
+from typing import List
 from ..schemas import PatientDetail, PatientNeedingTests, LabTest, PaginatedResponse
-from ..db.database import get_db
-from ..services.patient import PatientService
-router = APIRouter(prefix="/patients", tags=["patients"])
+from ..services.patient import PatientService, get_patient_service
 
-def get_patient_service(db: Session = Depends(get_db)) -> PatientService:
-    return PatientService(db)
+router = APIRouter(prefix="/patients", tags=["patients"])
 
 @router.get("/need_tests", response_model=PaginatedResponse[PatientNeedingTests])
 async def get_patients(page: int, service: PatientService = Depends(get_patient_service)):
@@ -22,7 +18,7 @@ async def get_patient_details(
     patient_id: int = Path(..., title="The ID of the patient to get"),
     service: PatientService = Depends(get_patient_service)
 ):
-    """Get detailed information about a specific patient"""
+    """Get detailed information about a specific patient by patient_id"""
     try:
         result = service.get_patient_details(patient_id)
         if not result:
@@ -38,11 +34,12 @@ async def get_patient_tests(
     patient_id: int = Path(..., title="The ID of the patient to get tests for"),
     service: PatientService = Depends(get_patient_service)
 ):
-    """Get test history for a specific patient"""
     try:
         result = service.get_patient_tests(patient_id)
         if result is None:
             raise HTTPException(status_code=404, detail="Patient not found")
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

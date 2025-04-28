@@ -1,12 +1,11 @@
 fastapi==0.115.2
 uvicorn==0.34.2
-python-dotenv==1.0.1
-sqlalchemy==2.0.39
+python-dotenv==1.1.0
+sqlalchemy==2.0.40
 psycopg2-binary==2.9.10
-pydantic==2.10.2
-pydantic-settings==2.0.2
+pydantic==2.11.3
+pydantic-settings==2.9.1
 # Testing dependencies
-pytest==7.4.3
-httpx==0.25.0
-testcontainers-postgres==1.19.0
-pytest-asyncio==0.21.0
+pytest==8.3.5
+httpx==0.28.1
+pytest-asyncio==0.26.0

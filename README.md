@@ -151,10 +151,6 @@ _(Consider adding a small structure tree if relevant.)_
 - [ ] Configure centralized logging and monitoring 📈
 - [ ] Configure database backups and monitoring 💾
 
-### Deployment
-
-_(Details coming soon.)_
-
 ---
 
 ## 🧬 Data Model

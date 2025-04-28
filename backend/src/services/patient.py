@@ -5,6 +5,8 @@ from ..models.patient import PatientNeedingTests as PatientNeedingTestsModel
 from ..models.lab_tests import LabTest as LabTestModel
 from ..models.admissions import Admission
 from ..schemas import PaginatedResponse, PatientNeedingTests, PatientDetail, LabTest
+from fastapi import Depends
+from ..db.database import get_db
 
 class PatientService:
     def __init__(self, db: Session):
@@ -59,6 +61,7 @@ class PatientService:
             room_number=result.Admission.room_number,
             admission_date=result.Admission.admission_date,
             admission_time=result.Admission.admission_time,
+            hospitalization_case_number=result.Admission.hospitalization_case_number,
             primary_physician=result.Patient.primary_physician,
             insurance_provider=result.Patient.insurance_provider,
             blood_type=result.Patient.blood_type,
@@ -73,3 +76,7 @@ class PatientService:
             .order_by(LabTestModel.order_date.desc(), LabTestModel.order_time.desc())
             .all()
         )
+    
+
+def get_patient_service(db: Session = Depends(get_db)) -> PatientService:
+    return PatientService(db)

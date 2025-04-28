@@ -27,6 +27,7 @@ export interface PatientDetails {
   room_number: string;
   admission_date: string;
   admission_time: string;
+  hospitalization_case_number: number;
   primary_physician: string;
   insurance_provider: string;
   blood_type: string;

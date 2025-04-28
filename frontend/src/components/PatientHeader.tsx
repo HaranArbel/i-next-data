@@ -28,7 +28,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patientDetails }) => {
             <span className="hidden sm:block mx-2">•</span>
             <span className="flex items-center mt-1 sm:mt-0">
               <span className="font-medium">Case #:</span>
-              {/* <span className="ml-1">{patientDetails.hospitalization_case_number}</span> */}
+              <span className="ml-1">{patientDetails.hospitalization_case_number}</span>
             </span>
           </div>
         </div>

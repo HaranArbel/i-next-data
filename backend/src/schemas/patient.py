@@ -44,6 +44,7 @@ class PatientDetail(BaseModel):
     room_number: str
     admission_date: datetime
     admission_time: time
+    hospitalization_case_number: int
     primary_physician: Optional[str] = None
     insurance_provider: Optional[str] = None
     blood_type: Optional[str] = None

@@ -3,6 +3,8 @@ from ..models.lab_result import LabResult as LabResultModel
 from ..schemas.lab_result import LabResult
 from datetime import datetime, time, date
 import math
+from fastapi import Depends
+from ..db.database import get_db
 
 class LabTestService:
     def __init__(self, db: Session):
@@ -33,3 +35,6 @@ class LabTestService:
             performed_time=result.performed_time,
             reviewing_physician=result.reviewing_physician
         ) 
+    
+def get_lab_test_service(db: Session = Depends(get_db)) -> LabTestService:
+    return LabTestService(db)

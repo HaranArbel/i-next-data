@@ -8,7 +8,7 @@ interface PatientCardProps {
   patientDetails: PatientDetails;
 }
 
-const PatientCard: React.FC<PatientCardProps> = ({ patientDetails }) => {
+export const PatientCard: React.FC<PatientCardProps> = ({ patientDetails }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -25,5 +25,3 @@ const PatientCard: React.FC<PatientCardProps> = ({ patientDetails }) => {
     </div>
   );
 };
-
-export default PatientCard;

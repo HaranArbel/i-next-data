@@ -1,63 +1,47 @@
-# import pytest
-# from unittest.mock import Mock
-# from fastapi.testclient import TestClient
-# from datetime import date, datetime, timedelta
-# from src.app import app
-# from src.dependencies import get_patient_service
+from src.app import app
 
-# @pytest.fixture
-# def mock_patient_data():
-#     """Mock data for patient details"""
-#     return {
-#         "patient_id": 1100406,
-#         "first_name": "Brian",  # Updated to match actual data
-#         "last_name": "Patient",
-#         "date_of_birth": date(1990, 1, 1).isoformat(),
-#         "department": "Cardiology",
-#         "room_number": "101",
-#         "admission_date": (datetime.now() - timedelta(days=3)).isoformat(),
-#         "admission_time": datetime.now().time().isoformat(),
-#         "primary_physician": "Dr. Smith",
-#         "insurance_provider": "TestInsurance",
-#         "blood_type": "A+",
-#         "allergies": "None"
-#     }
+def test_get_patient_details(client):
+    response = client.get("/patients/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "patient_id": 1,
+        "first_name": "John",
+        "last_name": "Doe",
+        "date_of_birth": "1980-01-01",
+        "department": "ER",
+        "room_number": "101",
+        "admission_date": "2023-01-01T00:00:00",
+        "admission_time": "08:00:00",
+        "hospitalization_case_number": 123,
+        "primary_physician": "Dr. Smith",
+        "insurance_provider": "ProviderX",
+        "blood_type": "A+",
+        "allergies": "None"
+    }
 
-# @pytest.fixture
-# def mock_service(mock_patient_data):
-#     mock = Mock()
-#     mock.get_patient_details.return_value = mock_patient_data
-#     return mock
+def test_get_patient_details_not_found(client):
+    response = client.get("/patients/999")
+    print(response.json())
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Patient not found"}
 
-# @pytest.fixture
-# def client(mock_service):
-#     app.dependency_overrides[get_patient_service] = lambda: mock_service
-#     client = TestClient(app)
-#     yield client
-#     app.dependency_overrides.clear()
+def test_get_patient_tests(client):
+    response = client.get("/patients/1/tests")
+    print(response.json())
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "test_id": 1,
+            "patient_id": 1,
+            "test_name": "Blood Test",
+            "order_date": "2023-01-01",
+            "order_time": "07:00:00",
+            "ordering_physician": "Dr. Smith"
+        }
+    ]
 
-# def test_get_patient_by_id(client, mock_patient_data):
-#     """Test get patient by ID endpoint"""
-#     # Test successful patient retrieval
-#     response = client.get(f"/patients/{mock_patient_data['patient_id']}")
-#     assert response.status_code == 200
-#     patient = response.json()
-    
-#     # Verify patient details
-#     assert patient["patient_id"] == mock_patient_data["patient_id"]
-#     assert patient["first_name"] == mock_patient_data["first_name"]
-#     assert patient["last_name"] == mock_patient_data["last_name"]
-#     assert patient["department"] == mock_patient_data["department"]
-#     assert patient["room_number"] == mock_patient_data["room_number"]
-#     assert patient["primary_physician"] == mock_patient_data["primary_physician"]
-#     assert patient["insurance_provider"] == mock_patient_data["insurance_provider"]
-#     assert patient["blood_type"] == mock_patient_data["blood_type"]
-#     assert patient["allergies"] == mock_patient_data["allergies"]
-
-#     # Test non-existent patient
-#     response = client.get("/patients/99999")
-#     assert response.status_code == 404
-    
-#     # Test invalid patient ID format
-#     response = client.get("/patients/invalid")
-#     assert response.status_code == 422
+def test_get_patient_tests_not_found(client):
+    response = client.get("/patients/999/tests")
+    print(response.json())
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Patient not found"}

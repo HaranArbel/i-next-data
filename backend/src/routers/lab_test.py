@@ -1,14 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
-from typing import Optional
-from sqlalchemy.orm import Session
-from ..schemas import LabResult, LabTest
-from ..services.lab_test import LabTestService
-from ..db.database import get_db
+from ..schemas import LabResult
+from ..services.lab_test import LabTestService, get_lab_test_service
 
 router = APIRouter(prefix="/tests", tags=["lab_tests"])
-
-def get_lab_test_service(db: Session = Depends(get_db)) -> LabTestService:
-    return LabTestService(db)
 
 @router.get("/{test_id}/result", response_model=LabResult)
 async def get_test_result(
