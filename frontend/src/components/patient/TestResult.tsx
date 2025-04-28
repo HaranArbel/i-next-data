@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Check, AlertCircle, Loader2 } from 'lucide-react';
-import { apiService } from '../services/api';
-import { TestResult as TestResultType } from '../types/TestResult';
+
+import { apiService } from '../../services/api';
+import { TestResult as TestResultType } from '../../types/testResult';
 
 interface TestResultProps {
     testId: number;

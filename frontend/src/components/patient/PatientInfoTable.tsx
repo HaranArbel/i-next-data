@@ -3,13 +3,13 @@ import {
   Clock, 
   Calendar, 
   Stethoscope, 
-  Heart,
+  HeartPulse,
   AlertCircle,
   Building,
   User
 } from 'lucide-react';
-import { PatientDetails } from '../types/patient';
-import { formatDate, formatTime } from '../lib/utils';
+import { PatientDetails } from '../../types/patient';
+import { formatDate, formatTime } from '../../lib/utils';
 import DataField from './DataField';
 
 interface PatientInfoTableProps {
@@ -56,7 +56,7 @@ const PatientInfoTable: React.FC<PatientInfoTableProps> = ({ patientDetails }) =
             <DataField 
               label="Blood Type" 
               value={patientDetails.blood_type} 
-              icon={<Heart className="h-4 w-4" />}
+              icon={<HeartPulse className="h-4 w-4" />}
             />
             <DataField 
               label="Allergies" 

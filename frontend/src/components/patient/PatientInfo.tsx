@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PatientCard } from "./PatientCard";
-import { apiService } from "../services/api";
-import { PatientDetails } from "../types/patient";
+import { apiService } from "../../services/api";
+import { PatientDetails } from "../../types/patient";
 import { Activity } from "lucide-react";
 
 export const PatientInfo = () => {

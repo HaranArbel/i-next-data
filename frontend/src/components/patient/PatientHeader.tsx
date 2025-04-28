@@ -1,7 +1,7 @@
 import React from 'react';
 import { ClipboardList, User } from 'lucide-react';
-import { PatientDetails } from '../types/patient';
-import { calculateAge } from '../lib/utils';
+import { PatientDetails } from '../../types/patient';
+import { calculateAge } from '../../lib/utils';
 
 interface PatientHeaderProps {
   patientDetails: PatientDetails;

@@ -1,7 +1,7 @@
 import { API_BASE_URL, endpoints } from './config';
 import { Patient, PatientDetails } from '../types/patient';
 import { LabTest } from '../types/labTest';
-import { TestResult } from '../types/TestResult';
+import { TestResult } from '../types/testResult';
 import { PaginatedResponse } from '../types/patient';
 
 class ApiService {
@@ -30,8 +30,8 @@ class ApiService {
         }
     }
 
-    async getPatients(page: number): Promise<PaginatedResponse<Patient>> {
-        return this.request<PaginatedResponse<Patient>>(endpoints.patients.needingTests(page));
+    async getPatients(page: number, department: string): Promise<PaginatedResponse<Patient>> {
+        return this.request<PaginatedResponse<Patient>>(endpoints.patients.needingTests(page, department));
     }
 
     async getPatientDetails(patientId: string): Promise<PatientDetails> {
@@ -44,6 +44,10 @@ class ApiService {
 
     async getTestResult(testId: string): Promise<TestResult> {
         return this.request<TestResult>(endpoints.tests.result(testId));
+    }
+
+    async getDepartments() {
+        return this.request<string[]>(endpoints.departments.list());
     }
 }
 

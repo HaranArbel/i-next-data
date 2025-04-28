@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { formatDate, formatTime } from '../lib/utils';
+import { formatDate, formatTime } from '../../lib/utils';
 import { ClipboardList, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
-import { apiService } from '../services/api';
-import { LabTest } from '../types/labTest';
+import { apiService } from '../../services/api';
+import { LabTest } from '../../types/labTest';
 import TestResult from './TestResult';
 
 interface TestHistoryProps {

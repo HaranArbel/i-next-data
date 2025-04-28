@@ -1,7 +1,9 @@
 import React from 'react';
-import { Patient } from '../types/patient';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, differenceInHours, intervalToDuration } from 'date-fns';
 import { Calendar, Clock, User, Building2, FlaskConical, AlertTriangle } from 'lucide-react';
+
+import { Patient } from '../../types/patient';
+import { formatDateTime, formatShortDuration } from '../../lib/utils';
 import Pagination from './Pagination';
 
 interface PatientTableProps {
@@ -12,22 +14,25 @@ interface PatientTableProps {
   handlePageChange: (page: number) => void;
 }
 
+function formatTimeSinceLastTest(dateString: string) {
+  if (!dateString) return "N/A";
+  const now = new Date();
+  const lastTest = new Date(dateString);
+  const hours = differenceInHours(now, lastTest);
+
+  if (hours < 96) {
+    return `${hours}h`;
+  } else {
+    const duration = intervalToDuration({ start: lastTest, end: now });
+    const parts = [];
+    if (duration.years) parts.push(`${duration.years}y`);
+    if (duration.months) parts.push(`${duration.months}m`);
+    if (duration.days) parts.push(`${duration.days}d`);
+    return parts.join(' ') || '0d';
+  }
+}
 
 const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect, currentPage, totalPages, handlePageChange }) => {
-
-  const formatDateTime = (dateStr: string, timeStr: string) => {
-    const date = new Date(`${dateStr.split('T')[0]}T${timeStr}`);
-    return format(date, 'MMM dd, yyyy HH:mm');
-  };
-
-  const formatTimeSinceAdmission = (duration: string) => {
-    return duration.replace(/P(\d+)Y(\d+)DT(\d+)H(\d+)M.*/, '$1y $2d $3h $4m');
-  };
-
-  const getTimeSinceLastTest = (lastTestDate: string) => {
-    return formatDistanceToNow(new Date(lastTestDate), { addSuffix: true });
-  };
-
   return (
     <div className="max-w-7xl mx-auto">
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -83,11 +88,11 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect, 
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                       <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Duration: {formatTimeSinceAdmission(patient.time_since_admission)}</span>
+                      <span>Duration: {formatShortDuration(patient.time_since_admission)}</span>
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-left">
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {patient.department}
                     </div>
@@ -100,17 +105,19 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, onPatientSelect, 
                   </td>
 
                   <td className="px-6 py-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-900">
-                      <FlaskConical className="h-4 w-4 text-cyan-500" />
-                      <span>{patient.test_name}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      <span>Time Since Last Test: {getTimeSinceLastTest(patient.last_test_datetime)}</span>
+                    <div className="flex items-center space-x-2 text-sm text-red-600 mt-1">
+                      <AlertTriangle className="h-4 w-4 text-red-600" />
+                      <span>
+                        Time Since Last Test: {formatTimeSinceLastTest(patient.last_test_datetime)}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                       <Clock className="h-4 w-4 text-gray-500" />
                       <span>Last Test: {format(new Date(patient.last_test_datetime), 'MMM dd, yyyy HH:mm')}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                      <FlaskConical className="h-4 w-4 text-cyan-500" />
+                      <span>{patient.test_name}</span>
                     </div>
                   </td>
 
