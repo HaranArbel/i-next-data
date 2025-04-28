@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Patient } from '../types/patient';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Calendar, Clock, User, Building2, Activity, FlaskConical, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, User, Building2, FlaskConical, AlertTriangle } from 'lucide-react';
 import Pagination from './Pagination';
 
 interface PatientTableProps {

@@ -18,13 +18,14 @@ class ApiService {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const error = new Error(`HTTP error! status: ${response.status}`) as any;
+                error.response = response;
+                throw error;
             }
 
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error("API request failed:", error);  // Log any errors
             throw error;
         }
     }

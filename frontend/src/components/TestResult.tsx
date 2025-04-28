@@ -22,9 +22,9 @@ const TestResult: React.FC<TestResultProps> = ({ testId }) => {
                 if (err.response?.status === 404) {
                     setError('Results not available yet for this test');
                 } else {
+                    console.error('Error fetching test result:', err);
                     setError('Failed to load test result');
                 }
-                console.error('Error fetching test result:', err);
             } finally {
                 setLoading(false);
             }
