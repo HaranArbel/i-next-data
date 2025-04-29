@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from pydantic.config import ConfigDict
 from datetime import date, time
 
 class LabTest(BaseModel):    

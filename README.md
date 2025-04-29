@@ -1,225 +1,78 @@
 # Hospital Data Integration System
 
-A web application that helps medical staff monitor patients who have been hospitalized for more than 48 hours without new tests being performed. The system integrates data from the Patient Management System (PMS) and Laboratory Information System (LIS).
+A web application that helps medical staff monitor patients who have been hospitalized for more than 48 hours without new tests being performed.  
+The system integrates data from the Patient Management System (PMS) and Laboratory Information System (LIS).
 
-## 🩺 Monitoring Logic
+## Background
 
-The system flags patients who meet the following criteria:
+The hospital uses two separate database systems:
 
-- Currently admitted (no `release_date`)
-- Admitted for more than 48 hours
-- Last lab test was ordered more than 48 hours ago, or no test was ever ordered
+- **Patient Management System (PMS)**
+- **Laboratory Information System (LIS)**
 
-This monitoring helps medical staff identify patients who may need follow-up tests or assessments, ensuring continuous quality of care during hospitalization.
+Both systems sync their data to S3 buckets every few seconds in CSV format. Each update triggers a new file creation in the S3 bucket.
 
-### ⚠️ Clinical Caveat
+> **Note:** Reading and processing data from the S3 bucket is out of scope for this project. Sample data was injected directly into the database.
 
-A patient's latest test may have been ordered more than 48 hours ago, but the result could have been returned recently. While this may still be clinically valid, the patient's condition could have changed since then.
+## Known Data Issues
 
-### 🔍 Implementation Note
+### Duplicate `test_id` Values in CSVs
 
-Therefore:
+While validating `lab_tests.csv` and `lab_results.csv`, duplicate `test_id` values were identified, assigned to different lab tests.  
+This breaks the one-to-one mapping assumption between tests and results, leading to potential mismatches and clinical inaccuracies.
 
-- We flag the patient for review, but also display:
-  - Latest test order timestamp
-  - Latest test result timestamp
-  - Time since admission
+> **For a full description of the issue and the solution, see GitHub Issue #3.**
 
-This allows clinicians to make informed decisions based on the complete timeline.
+## High-Level Solution
 
-## ⚙️ Tech Stack
+This project is a full-stack patient monitoring system that integrates and displays data from PMS and LIS, enabling hospital staff to quickly identify patients who have been hospitalized for over 48 hours without recent lab tests.
 
-- **Backend**: Python with FastAPI
-  - SQLAlchemy for ORM
-  - Pydantic for data validation
-  - pytest for testing
-- **Frontend**: React with TypeScript
-  - Vite for build tooling
-- **Database**: PostgreSQL
-  - Stores integrated data from PMS and LIS systems
-  - Optimized for frequent reads and updates
-- **Infrastructure**:
-  - Docker for containerization
-  - Docker Compose for local development
-  - Testcontainers for integration testing
+- **Backend**: Built with **FastAPI (Python), SQLAlchemy ORM, Pydantic and Pytest for testing**, providing async support, modular structure, and automatic OpenAPI documentation generation.
+- **Frontend**: Developed with **React, TypeScript, and Vite**, offering a modern, high-performance UI with hot module reloading and strong typing.
+- **Database**: Powered by **PostgreSQL**, chosen for its relational data modeling, ACID compliance, scalability, and indexing capabilities. The database schema is normalized, with clear relationships between patients, admissions, lab tests, and lab results, ensuring data integrity and efficient querying.
+- **Containerization**: The project is fully containerized using **Docker** to ensure consistent deployment across environments.
 
-## 📂 Project Structure
+- **Features:**
+  - Patient dashboard presenting patient who have been hospitalized for more than 48 hours without new tests
+  - Calculates time since admission and last test
+  - filtering and pagination
+  - Detailed patient information and test history
+  - Department-based organization
+  - Modern UI with reusable components
 
-_(Consider adding a small structure tree if relevant.)_
+> **Note:** A view (`patients_needing_tests`) was created in the database to serve as a virtual table for efficient patient querying. The view selects only patients who are still currently admitted to the hospital and who have not had lab tests performed in the past 48 hours.
 
-## 📋 Project Tasks
+The system assumes that PMS and LIS data is already loaded into the database, that their schemas are stable for the project's scope, and that the application is read-only with no modifications back to PMS or LIS.
 
-### 🛠️ Backend
+To support scalability and performance:
 
-- [x] Set up FastAPI project structure
-- [x] Implement database models with SQLAlchemy
-- [x] Create API endpoint for patients needing tests
-- [x] Create additional API endpoints:
-  - Patient data
-  - Lab tests
-- [ ] Implement backend filtering (e.g., department, physician) 🔎
-- [ ] Use `asyncpg` driver and threading for improved DB access ⚡ + connection pool
-- [x] Implement pagination for API responses 📄
-- [ ] Add sorting functionality in API (sort by name, time since admission, last test ordered) ↕️
-- [x] Add request validation with Pydantic ✅
-- [ ] Add strict versioning to requirements.txt
-- [ ] Add error handling and logging 🐞
-- [ ] Add a rate limiter to API ? 🚦
-- [ ] Review admission time threshold logic (configurable 48-hour rule) 🕒
-- [ ] Update and enrich dummy data (realistic admissions/tests from 2024-2025) 🏥
+- The backend leverages indexed columns and pagination for efficient querying.
+- Future enhancements include background workers for near real-time updates, caching layers (e.g., Redis), database migration tooling (e.g., Alembic), and advanced query optimizations.
 
-#### 🚀 Backend - Next Steps
+### Data Modeling
 
-- [ ] 🔐 Add user authentication and authorization
-- [ ] ⚡ Use `asyncpg` driver and threading for optimized DB performance
+- Tables:
+  - **Patients**: Contains basic patient information.
+  - **Admissions**: Tracks patient admission and discharge details.
+  - **Lab Tests**: Defines available lab tests.
+  - **Lab Results**: Records results tied to tests and patients.
+- **Relationships**:
+  - Foreign keys link admissions to patients and lab results to lab tests.
+  - Ensures strong referential integrity and enables complex, performant queries.
+- The structure supports scalability to accommodate large volumes of hospital data efficiently.
 
----
+> **Note:** For the sake of this exercise, we assume that the schema of the source systems is stable.
 
-### 💻 Frontend
+### Database Optimization
 
-- [x] Set up React project with Vite ⚡
-- [x] Create component structure 🧩
-- [x] Implement patient list view (table) 🏥
-- [x] Implement patient details view 📋
-- [ ] Set up loading spinner for Patient Table data with animation
-- [x] Display test history and results per patient 🧪
-- [ ] Implement frontend-side filters (department, physician) 🔍
-- [x] Implement frontend pagination 📚 - Replace with Infinity Scroll ?
-- [ ] Add loading and error states ⏳
-
-#### 🚀 Frontend - Next Steps
-
-- [ ] 🔎⏱️ Add live search with debounce
-- [ ] 📢 Add real-time UI notifications for new test orders (using WebSocket)
-- [ ] 📊 Add dashboard stats (patient counts, averages, etc.)
-- [ ] 🚀 Migrate frontend to the latest React Router version
-- [ ] Add search functionality with debounce 🔎⏱️
-- [ ] Add UI notifications for new test orders (real-time updates) 📢
-- [ ] Add dashboard stats (e.g., number of patients needing tests, average admission time) 📊
-- [ ] Update frontend to latest React Router version 🚀
-- [ ] Implement responsive design 📱
-- [ ] Implement sorting by table columns ↕️
-
----
-
-### 🗄️ Database
-
-- [x] Create database schema 📊
-- [x] Create ETL for CSV files 📥
-- [x] Add database indicies:
-  - Admission status index
-  - Lab tests timeline index
-  - Lab results timeline index
-- [x] Set up database validation and constraints 🔐
-- [x] Create `patients_needing_tests` view 🏥
-- [x] Set up PostgreSQL on cloud ☁️🛢️
-- [ ] Convert `patients_needing_tests` to materialized view ? 🏗️
-- [ ] Set up read replicas for scaling 🛢️ ?
-- [ ] Polish database schema (consider denormalization) 🛠️ ?
-- [ ] Create backup and restore procedures 💾
-- [ ] Review and optimize indices 🔍
-
----
-
-### 🧪 Testing and CI/CD
-
-- [x] Set up test environment with Pytest 🧪
-- [x] Write unit tests for backend services 🧹
-- [ ] Fix broken or incomplete pytest tests 🛠️
-- [ ] Set up CI/CD pipeline (github action) 🚀
-  - Configure automatic testing on pull requests (to dev and master) 🔄
-
-#### 🚀 Testing and CI/CD - Next Steps
-
-- [ ] Create end-to-end tests (e.g., Playwright, Cypress) 🎭
-- [ ] Write integration tests for API endpoints 🔗
-- [ ] 🎭 Implement full end-to-end testing (e.g., Playwright, Cypress)
-- [ ] 🚀 Set up CI/CD pipeline to automate build and test workflows
-
----
-
-### ☁️ Infrastructure
-
-- [x] Set up Docker Compose 🐳
-- [x] Configure environment variables ⚙️
-- [ ] Configure backend and database health checks 🩺
-- [ ] Deploy application to cloud environment ☁️
-
-#### 🚀 Infrastructure - Next Steps
-
-- [ ] ☁️ Deploy the full system to a production cloud environment
-- [ ] Configure centralized logging and monitoring 📈
-- [ ] Configure database backups and monitoring 💾
-
----
-
-## 🧬 Data Model
-
-### Patients
-
-| Column               | Type | Description          |
-| :------------------- | :--- | :------------------- |
-| `patient_id`         | INT  | Primary key          |
-| `first_name`         | TEXT | Patient's first name |
-| `last_name`          | TEXT | Patient's last name  |
-| `date_of_birth`      | DATE | Patient's birth date |
-| `primary_physician`  | TEXT | Primary care doctor  |
-| `insurance_provider` | TEXT | Insurance company    |
-| `blood_type`         | TEXT | Blood type           |
-| `allergies`          | TEXT | Known allergies      |
-
-### Admissions
-
-| Column                        | Type | Description                              |
-| :---------------------------- | :--- | :--------------------------------------- |
-| `hospitalization_case_number` | INT  | Primary key                              |
-| `patient_id`                  | INT  | Foreign key to Patients                  |
-| `admission_date`              | DATE | Date of admission                        |
-| `admission_time`              | TIME | Time of admission                        |
-| `release_date`                | DATE | Date of release (NULL if still admitted) |
-| `release_time`                | TIME | Time of release                          |
-| `department`                  | TEXT | Hospital department                      |
-| `room_number`                 | TEXT | Room assignment                          |
-
-### Lab Tests
-
-| Column               | Type | Description                 |
-| :------------------- | :--- | :-------------------------- |
-| `test_id`            | INT  | Primary key                 |
-| `patient_id`         | INT  | Foreign key to Patients     |
-| `test_name`          | TEXT | Name of the test            |
-| `order_date`         | DATE | Date test was ordered       |
-| `order_time`         | TIME | Time test was ordered       |
-| `ordering_physician` | TEXT | Doctor who ordered the test |
-
-### Lab Results
-
-| Column                | Type  | Description                        |
-| :-------------------- | :---- | :--------------------------------- |
-| `result_id`           | INT   | Primary key                        |
-| `test_id`             | INT   | Foreign key to Lab Tests           |
-| `result_value`        | FLOAT | Test result value                  |
-| `result_unit`         | TEXT  | Unit of measurement                |
-| `reference_range`     | FLOAT | Normal range value                 |
-| `result_status`       | TEXT  | Status (Normal, Abnormal High/Low) |
-| `performed_date`      | DATE  | Date test was performed            |
-| `performed_time`      | TIME  | Time test was performed            |
-| `reviewing_physician` | TEXT  | Doctor who reviewed results        |
-
----
-
-## 🛠️ Database Optimization
-
-### Indexes
+#### Indexes
 
 Optimized for fast monitoring queries:
 
 1. **Admission Status Index**
-
    ```sql
    CREATE INDEX idx_admission_status ON admissions(patient_id, admission_date, release_date);
    ```
-
 2. **Lab Tests Timeline Index**
 
    ```sql
@@ -232,9 +85,8 @@ Optimized for fast monitoring queries:
    CREATE INDEX idx_lab_results_patient_performed_datetime ON lab_results(test_id, performed_date DESC, performed_time DESC);
    ```
 
----
-
-### Monitoring View
+<details>
+<summary><b>View Query: patients_needing_tests</b></summary>
 
 ```sql
 CREATE OR REPLACE VIEW patients_needing_tests AS
@@ -292,24 +144,76 @@ WHERE
   );
 ```
 
-## 📌 Key Points
+</details>
 
-- Uses CTEs for clarity and maintainability
-- Caches current timestamp for consistency
-- Flags patients early for review
-- Includes timestamps and hospitalization details
-- Calculates time since admission and last test
-- Supports clinical decision-making
+## Project Tasks
+
+### Backend
+
+- [x] Set up FastAPI project structure
+- [x] Implement database models with SQLAlchemy
+- [x] Create API endpoints:
+  - [x] Patients Needing Tests
+  - [x] Patient data
+  - [x] Lab tests
+  - [x] Departments
+- [x] Add request validation with Pydantic
+- [x] Implement pagination for API responses
+- [x] Implement backend filtering (e.g., department, physician)
+- [x] Add strict versioning to requirements.txt
+
+### Frontend
+
+- [x] Set up React project with Vite
+- [x] Create component structure
+  - [x] Implement patient list view (table)
+  - [x] Implement patient details view
+  - [x] Implement test history and results per patient
+- [x] Implement pagination - consider replacing with Infinite Scroll
+- [x] Implement frontend-side filter
+- [x] Add loading and error states
+
+### Database
+
+- [x] Set up PostgreSQL on cloud
+- [x] Create database schema
+- [x] Create ETL for loading CSV files
+- [x] Add database indicies:
+  - [x] Admission status index
+  - [x] Lab tests timeline index
+  - [x] Lab results timeline index
+- [x] Set up database validation and constraints
+- [x] Create `patients_needing_tests` view
+
+### Testing and CI/CD
+
+- [x] Set up test environment with Pytest
+- [x] Write unit tests for backend services
+
+### Infrastructure
+
+- [x] Set up Docker Compose
+- [x] Configure environment variables
+- [x] Deploy application to cloud environment
 
 ---
 
-## 🐞 Known Data Issues
+## Next Steps
 
-### Duplicate `test_id` Values in CSVs
-
-While validating `lab_tests.csv` and `lab_results.csv`, duplicate `test_id` values were identified, assigned to different lab tests.  
-This breaks the one-to-one mapping assumption between tests and results, leading to potential mismatches and clinical inaccuracies.
-
-> **For a full description of the issue and the solution, see GitHub Issue #3.**
-
----
+- [ ] Add dashboard stats (e.g., number of patients needing tests, average admission time)
+- [ ] Add live search by patient (id/name) with debounce
+- [ ] Implement sorting by table columns
+- [ ] Add real-time UI notifications for new test orders (using Server Sent Events, WebSocket or polling)
+- [ ] Test DB performance (high reads/writes)
+- [ ] Support high read traffic:
+  - [ ] Add connection pooling for improved DB access
+  - [ ] Consider changing view to `materialized-view` for caching the results and supporting high read traffic
+  - [ ] Set up DB read replicas for scaling
+- [ ] Implement automated database migrations (Alembic)
+- [ ] Create backup and restore procedures
+- [ ] Add monitoring and logging
+- [ ] Configure centralized logging and monitoring
+- [ ] Add comprehensive test coverage (backend & frontend)
+- [ ] Create end-to-end tests (e.g., Playwright, Cypress)
+- [ ] Set up CI/CD pipeline to automate build and test workflows
+- [ ] Container orchestration (e.g., Kubernetes) for production deployment

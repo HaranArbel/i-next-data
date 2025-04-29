@@ -10,6 +10,3 @@ class LabResult(BaseModel):
     performed_date: date | None = None
     performed_time: time | None = None
     reviewing_physician: str | None = None
-
-    class Config:
-        from_attributes = True 
