@@ -1,9 +1,9 @@
 # Hospital Data Integration System
 
+## Background
+
 A web application that helps medical staff monitor patients who have been hospitalized for more than 48 hours without new tests being performed.  
 The system integrates data from the Patient Management System (PMS) and Laboratory Information System (LIS).
-
-## Background
 
 The hospital uses two separate database systems:
 
@@ -13,15 +13,6 @@ The hospital uses two separate database systems:
 Both systems sync their data to S3 buckets every few seconds in CSV format. Each update triggers a new file creation in the S3 bucket.
 
 > **Note:** Reading and processing data from the S3 bucket is out of scope for this project. Sample data was injected directly into the database.
-
-## Known Data Issues
-
-### Duplicate `test_id` Values in CSVs
-
-While validating `lab_tests.csv` and `lab_results.csv`, duplicate `test_id` values were identified, assigned to different lab tests.  
-This breaks the one-to-one mapping assumption between tests and results, leading to potential mismatches and clinical inaccuracies.
-
-> **For a full description of the issue and the solution, see GitHub Issue #3.**
 
 ## High-Level Solution
 
@@ -38,18 +29,10 @@ This project is a full-stack patient monitoring system that integrates and displ
   - filtering and pagination
   - Detailed patient information and test history
   - Department-based organization
-  - Modern UI with reusable components
-
-> **Note:** A view (`patients_needing_tests`) was created in the database to serve as a virtual table for efficient patient querying. The view selects only patients who are still currently admitted to the hospital and who have not had lab tests performed in the past 48 hours.
-
-The system assumes that PMS and LIS data is already loaded into the database, that their schemas are stable for the project's scope, and that the application is read-only with no modifications back to PMS or LIS.
-
-To support scalability and performance:
-
-- The backend leverages indexed columns and pagination for efficient querying.
-- Future enhancements include background workers for near real-time updates, caching layers (e.g., Redis), database migration tooling (e.g., Alembic), and advanced query optimizations.
 
 ### Data Modeling
+
+> **Note:** For the sake of this exercise, we assume that the schema of the source systems is stable, and that the application is read-only with no modifications back to PMS or LIS.
 
 - Tables:
   - **Patients**: Contains basic patient information.
@@ -61,7 +44,7 @@ To support scalability and performance:
   - Ensures strong referential integrity and enables complex, performant queries.
 - The structure supports scalability to accommodate large volumes of hospital data efficiently.
 
-> **Note:** For the sake of this exercise, we assume that the schema of the source systems is stable.
+> **Note:** A view (`patients_needing_tests`) was created in the database to serve as a virtual table for efficient patient querying. The view selects only patients who are still currently admitted to the hospital and who have not had lab tests performed in the past 48 hours.
 
 ### Database Optimization
 
@@ -209,7 +192,7 @@ WHERE
   - [ ] Add connection pooling for improved DB access
   - [ ] Consider changing view to `materialized-view` for caching the results and supporting high read traffic
   - [ ] Set up DB read replicas for scaling
-- [ ] Implement automated database migrations (Alembic)
+- [ ] Implement automated database migrations
 - [ ] Create backup and restore procedures
 - [ ] Add monitoring and logging
 - [ ] Configure centralized logging and monitoring
@@ -217,3 +200,59 @@ WHERE
 - [ ] Create end-to-end tests (e.g., Playwright, Cypress)
 - [ ] Set up CI/CD pipeline to automate build and test workflows
 - [ ] Container orchestration (e.g., Kubernetes) for production deployment
+
+## Running the Application
+
+### Local Development
+
+To run the application locally using Docker Compose:
+
+1. **Build the containers:**
+
+   ```sh
+   docker compose build
+   ```
+
+2. **Start the services:**
+
+   ```sh
+   docker compose up
+   ```
+
+3. **Access the app:**
+   - The frontend will be available at: [http://localhost:80](http://localhost:80)
+   - The backend API will be available at: [http://localhost:8000](http://localhost:8000)
+
+> **Note:** Ensure you have a `.env` file in your project root with all required environment variables (see `.env.example` if available).
+
+---
+
+### Production Deployment
+
+The application is deployed and accessible at:
+
+- **Frontend (Vercel):** [https://patient-monitoring-system-six.vercel.app/](https://patient-monitoring-system-six.vercel.app/)
+- **Backend (Render):** [https://patient-monitoring-system-tk8w.onrender.com/](https://patient-monitoring-system-tk8w.onrender.com/)
+
+---
+
+## Known Data Issues
+
+### 1. Duplicate `test_id` Values in CSVs
+
+While validating `lab_tests.csv` and `lab_results.csv`, duplicate `test_id` values were identified, assigned to different lab tests.  
+This breaks the one-to-one mapping assumption between tests and results, leading to potential mismatches and clinical inaccuracies.
+
+> **For a full description of the issue and the solution, see GitHub Issue #3.**
+
+### 2. Multiple values in the `result_unit` column in `lab_results.csv` leading to ambiguity
+
+Some rows in `lab_results.csv` contain multiple values in the `result_unit` column, which creates ambiguity about which unit applies to the result.
+
+**Example:**
+
+| test_id | patient_id | result_value | result_unit   | ... |
+| ------- | ---------- | ------------ | ------------- | --- |
+| 327681  | 123456     | 5.2          | mg/dL, mmol/L | ... |
+
+This makes it unclear which unit should be used for interpreting the result, potentially leading to clinical misinterpretation.
